@@ -1,0 +1,22 @@
+In the o2host folder, find the o2host application in the Debug folder and launch it. 
+
+Create a configuration and run o2host. For the configuration, choose an ensemble name and a port. 
+- what do all the parts of configuration mean
+
+Create a directory named www for your files, and store any project files there, including index.html, index.js, and o2ws.js.
+
+In your Javascript code, to initialize the o2host, you must call o2ws_initialize(param) with the ensemble name you chose earlier as the parameter. 
+Assuming you have chosen an area in your configuration wide enough, this will initialize the o2host with that name for actions on the browser side. 
+
+To receive a list of all services, 
+
+
+
+
+xcode building
+
+
+
+questions for him: 
+1. We should have connect take host as optional parameter for o2ws_initialize and if the parameter is not present use the document.location.host
+2. When we get list of services, the typespec is siss, the first string is service name, second is status, what are the other two values? 

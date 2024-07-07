@@ -5,6 +5,7 @@ const connectedMessage = document.getElementById("connected");
 const servicesListDisplay = document.getElementById("serviceslist");
 const newServiceName = document.getElementById("newName");
 const messageSend = document.getElementById("sendMessage");
+const typespecInfo = document.getElementById("typespecInput");
 var messageType;
 const ensembleName = "saanvi";
 const host = "localhost:8000";
@@ -58,7 +59,7 @@ function handle_list_services(address, typespec, info) {
   console.log(x);
   console.log(address);
   console.log(info);
-  displayService(service_name, status);
+  displayService(service_name, info, status);
 }
 
 function handle_message(timestamp, address, typespec, info) {
@@ -67,17 +68,17 @@ function handle_message(timestamp, address, typespec, info) {
    timestamp: timestamp,
    message: "",
  };
-  let a;
+  let a = "";
   console.log("typespec is " + typespec);
   for (let i = 0; i < typespec.length; i++) {
     if (typespec[i] === "i") {
-      a = o2ws_get_int();
+      a += o2ws_get_int() + ", ";
     } else if (typespec[i] === "s") {
-      a = o2ws_get_string();
+      a += o2ws_get_string() + ", ";
     } else if (typespec[i] === "f") {
-      a = o2ws_get_float();
+      a += o2ws_get_float() + ", ";
     } else if (typespec[i] === "d") {
-      a = o2ws_get_double();
+      a += o2ws_get_double() + ", ";
     }
     console.log("message is " + a);
     
@@ -95,8 +96,9 @@ function handle_message(timestamp, address, typespec, info) {
 }
 
 
-function displayService(serviceName, serviceStatus) {
+function displayService(serviceName, serviceTypespec, serviceStatus) {
 
+   console.log("DISPLAYING SERVICE");
    console.log(data);
   for (let i = 0; i < data.services.length; i++) {
     if (data.services[i].name === serviceName) {
@@ -109,6 +111,7 @@ function displayService(serviceName, serviceStatus) {
   } else {
     data.services.push({
       name: serviceName,
+      // typespecString: serviceTypespec,
       status: serviceStatus,
       selected: false,
       messages: [],
@@ -130,15 +133,17 @@ if (viewServicesButton) {
 if (createServiceButton) {
   createServiceButton.addEventListener("click", function () {
     newservice = "";
+    typespec = typespecInfo.value;
     if (newServiceName.value != "") {
       newservice = newServiceName.value;
     }
-    console.log("starting creating service: " + newservice);
-    o2ws_method_new("/" + newservice, "s", false, handle_message, null);
-
+    typespecInfo.value = "";
+    console.log("starting creating service: " + newservice + " typespec = " + typespec);
+    o2ws_method_new("/" + newservice, typespec, false, handle_message, null);
 
     data.services.push({
       name: newservice,
+      // typespecString: typespec,
       status: 6,
       selected: false,
       messages: [],
@@ -161,15 +166,44 @@ function sendMsg(e) {
   serviceName = e.id;
   const messageGet = document.getElementById("messageGet-" + serviceName);
 
-  o2ws_send("/" + serviceName, 0, "s", messageGet.value); // sample message
+  var time = o2ws_time_get();
+  if (time == -1) {
+   time = o2ws_local_time();
+  }
 
+  const messageType = document.getElementById("messageType-" + serviceName);
+  let messageArr = messageGet.value.split(",");
+  var typespec = messageType.value;
+  let arr = ["/" + serviceName, 0, typespec];
+
+  for (let i = 0; i < typespec.length; i++) {
+   if (typespec[i] === "i") {
+     arr.push(parseInt(messageArr[i]));
+   } else if (typespec[i] === "s") {
+      arr.push(messageArr[i]);
+   } else if (typespec[i] === "f") {
+      arr.push(parseFloat(messageArr[i]));
+   } else if (typespec[i] === "d") {
+      arr.push(parseFloat(messageArr[i]));
+   }
+   console.log("message is " + messageGet.value);
+   
+   // console.log("timestamp = " + timestamp);
+ }
+ console.log(arr);
+   o2ws_send.call(this, ...arr); 
+
+
+//   o2ws_send("/" + serviceName, 0, messageType.value, messageGet.value); 
+  console.log("msg is " + messageGet.value);
   messageGet.value = "";
+  messageType.value = "";
   console.log("message sent to " + serviceName);
 }
 
 function tap(e) {
    var tapper = "tap_" + e.id;
-   o2ws_method_new("/" + tapper, "s", false, handle_message, null);
+   o2ws_method_new("/" + tapper, "si", false, handle_message, null); // TODO: typespec
    o2ws_set_services(tapper);
    data.services.push({
       name: tapper,
@@ -179,8 +213,7 @@ function tap(e) {
       localService: true
    });
 
-
-   var tappingString = "/" + e.id + ":/" + tapper + ":K" // "K" for TAP_KEEP, "R" for TAP_RELIABLE, or "B" for TAP_BEST_EFFORT 
+   var tappingString = "" + e.id + ":" + tapper + ":K" // "K" for TAP_KEEP, "R" for TAP_RELIABLE, or "B" for TAP_BEST_EFFORT 
    o2ws_tap(tappingString);
    generateOutput();
    console.log(tappingString);

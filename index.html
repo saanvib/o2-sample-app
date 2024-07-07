@@ -76,6 +76,7 @@ https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js
          <thead>
            <tr>
              <th scope="col">Service Name</th>
+             <!-- <th scope="col">Service Typespec</th> -->
              <th scope="col">Status</th>
            </tr>
          </thead>
@@ -87,9 +88,11 @@ https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js
             <td><button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#messageModal" onclick="showMessages(this);">{{this.name}}</button></td>
             {{else}} <td>{{this.name}} </td>{{/if}}
 
+            <!-- <td>{{this.typespecString}}</td> -->
              <td>{{this.status}}</td>
              <td>
-               <div class="input-group mb-3" style="max-width: 300px;">
+               <div class="input-group mb-3" style="max-width: 500px;">
+                  <input type="text" id="messageType-{{this.name}}" class="form-control" placeholder="Message typespec">
                   <input type="text" id="messageGet-{{this.name}}" class="form-control" placeholder="Message to send">
                   <div class="input-group-append">
                     <button class="btn btn-outline-secondary" id={{this.name}} type="button" onclick="sendMsg(this);">Send Message</button>
@@ -157,6 +160,10 @@ https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js
          <p>Enter name for new service.</p>
          <div class="col-sm-6">
          <input type="text" id="newName"></input>
+         </div>
+         <p>Enter typespec for new service. String of consecutive characters, with s=string, i=integer, d=double, f=float. Ex: "siss" = string, integer, string, string.</p>
+         <div class="col-sm-6">
+         <input type="text" id="typespecInput"></input>
          </div>
        </div>
        <div class="modal-footer">

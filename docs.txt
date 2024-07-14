@@ -17,6 +17,16 @@ xcode building
 
 
 
-questions for him: 
-1. We should have connect take host as optional parameter for o2ws_initialize and if the parameter is not present use the document.location.host
-2. When we get list of services, the typespec is siss, the first string is service name, second is status, what are the other two values? 
+This application is an O2lite websocket monitor. 
+The user connects to an O2host and then can create services and send messages to other services.
+To see a list of all services connected to the o2host, the user can simply click Discover Services, and all running services will be displayed along with their status. 
+
+Each remote service connected to the o2host can be tapped, meaning all future messages sent to that service will be forwarded to the local service that tapped it. 
+No messages sent before tap was enabled will be shown.
+The user can send messages from one service to another, local or remote. 
+For sending messages, the user has the option to specify an address for the service. The user must specify the typespec for the message to be sent. 
+Then, the message must be inputted with commas between each input.
+
+
+
+

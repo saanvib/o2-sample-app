@@ -368,11 +368,15 @@ function o2ws_schedule_handler(handler, timestamp, address, typespec, info) {
             setTimeout(handler, Math.round(timestamp - now) * 1000, timestamp, 
                        address, typespec, info);
         }
+        else { // Past or at current time, so deliver the message.
+            handler(timestamp, address, typespec, info);
+        }
     }
-    if (timestamp <= 0) {  // O2 does not allow negative timestamps, but if
+    else if (timestamp <= 0) {  // O2 does not allow negative timestamps, but if
         // we get one, we treat it as if it is zero
         handler(timestamp, address, typespec, info);
-    } else {
+    } 
+    else {
         // otherwise, the timestamp is >0 but the clock is not synchronized.
         // the message should have been dropped by the sender. We drop it here.
         console.log("o2ws_message_handler timestamp >0, but not synced yet.")

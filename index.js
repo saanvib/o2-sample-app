@@ -29,18 +29,15 @@ var tappeeService = ""; // global variable to track service being tapped for sho
 function o2wsInit() {
   o2ws_initialize(ensembleName.value, hostName.value);
   if (o2ws_websocket) {
-    // TODO: how to check if connected or not
-    console.log(o2ws_websocket);
-    console.log("connection successful");
+    // console.log("connection successful");
     document.getElementById("mainBody").hidden = false;
     connectedMessage.hidden = false;
     document.getElementById("ensembleGetter").hidden = true;
-    //   o2ws_status_msgs_enable = true;
     o2ws_method_new("/_o2/ls", "siss", false, handle_list_services, null);
     handlebarsHelpers();
   } else {
     bootstrap.Toast.getOrCreateInstance(toast).show();
-    console.log("connection failed, try again");
+    // console.log("connection failed, try again");
   }
 }
 
@@ -64,31 +61,30 @@ function o2ws_on_error(msg) {
 
 // Handles displaying list of services connected to this o2host.
 function handle_list_services(address, typespec, info) {
-  console.log("handler called: " + address);
+  // console.log("handler called: " + address);
   var service_name = o2ws_get_string();
-  console.log(service_name);
+  // console.log(service_name);
   var status = o2ws_get_int();
-  console.log(status);
+  // console.log(status);
   x = o2ws_get_string();
-  console.log(x);
+  // console.log(x);
   x = o2ws_get_string();
-  console.log(x);
-  console.log(address);
-  console.log(info);
+  // console.log(x);
+  // console.log(address);
+  // console.log(info);
   displayService(service_name, info, status);
 }
 
 // Handler for message receiving to a service.
 function handle_message(timestamp, address, typespec, info) {
   // in the format /sensor/data@10.760 "iffs" 15 3.1415 2.0 "hello world"
-  console.log("handler for message called for service");
   const messageData = {
     timestamp: timestamp,
     address: address,
     message: "",
   };
   let a = "";
-  console.log("typespec is " + typespec);
+  // console.log("typespec is " + typespec);
   for (let i = 0; i < typespec.length; i++) {
     if (typespec[i] === "i") {
       a += o2ws_get_int() + " ";
@@ -99,9 +95,7 @@ function handle_message(timestamp, address, typespec, info) {
     } else if (typespec[i] === "d") {
       a += o2ws_get_double() + "d ";
     }
-    console.log("message is " + a);
-
-    console.log("timestamp = " + timestamp);
+    
   }
 
   var msg = "/" + address + "@" + timestamp + ' "' + typespec + '" ' + a;
@@ -112,13 +106,12 @@ function handle_message(timestamp, address, typespec, info) {
       data.services[i].messages.push(messageData);
     }
   }
-  console.log(data);
+  // console.log(data);
 }
 
 // Displays service information.
 function displayService(serviceName, serviceTypespec, serviceStatus) {
-  console.log("DISPLAYING SERVICE");
-  console.log(data);
+  // console.log(data);
   for (let i = 0; i < data.services.length; i++) {
     if (data.services[i].name === serviceName) {
       return;
@@ -140,45 +133,55 @@ function displayService(serviceName, serviceTypespec, serviceStatus) {
   }
 
   generateOutput();
-  console.log("displaying " + data);
+  // console.log("displaying " + data);
 }
 
 // Discover and display all services.
 function viewServices() {
-  console.log("starting discovery");
-  o2ws_send("/_o2/ws/ls", 0, "");
+  // console.log("starting discovery");
+  var time = 0;
+
+  if (o2ws_clock_synchronized) {
+    time = o2ws_time_get();
+    // console.log("clock synced");
+  }
+
+  o2ws_send("/_o2/ws/ls", time, "");
 }
 
 // Create a new service.
 function createService() {
   newservice = "";
-  typespec = typespecInfo.value;
   if (newServiceName.value != "") {
     newservice = newServiceName.value;
   }
-  if (typespec === "") {
-    typespec = null;
-  }
-  typespecInfo.value = "";
-  console.log(
-    "starting creating service: " + newservice + " typespec = " + typespec
-  );
+  typespec = null;
+  // console.log(
+//     "starting creating service: " + newservice + " typespec = " + typespec
+//   );
   o2ws_method_new("/" + newservice, typespec, false, handle_message, null);
 
   data.services.push({
     name: newservice,
-    // typespecString: typespec,
     status: 6,
     statusName: statuses[6],
     selected: false,
     messages: [],
     localService: true,
   });
-  console.log(data);
+  // console.log(data);
 
   o2ws_set_services(newservice);
-  o2ws_send("/_o2/ws/ls", 0, "");
-  console.log(newservice);
+
+  var time = 0;
+
+  if (o2ws_clock_synchronized) {
+    time = o2ws_time_get();
+    // console.log("clock synced");
+  }
+
+  o2ws_send("/_o2/ws/ls", time, "");
+  // console.log(newservice);
   generateOutput();
 }
 
@@ -193,12 +196,12 @@ function sendMsg(e) {
 
   var time = 0;
 
-   //  if (o2ws_clock_synchronized) {
-   //   time = o2ws_local_time();
-   //   console.log("clock synced");
-   //  }
+  if (o2ws_clock_synchronized) {
+    time = o2ws_time_get();
+    // console.log("clock synced");
+  }
 
-   // TODO: it shows me clock synchronized and then gives this error when sending message
+  // TODO: it shows me clock synchronized and then gives this error when sending message
 
   const messageAddress = document.getElementById(
     "addressPostfix-" + serviceName
@@ -218,16 +221,15 @@ function sendMsg(e) {
     } else if (typespec[i] === "d") {
       arr.push(parseFloat(messageArr[i]));
     }
-    console.log("message is " + messageGet.value);
-    // console.log("timestamp = " + timestamp);
+   //  console.log("message is " + messageGet.value);
   }
-  console.log(arr);
+//   console.log(arr);
   o2ws_send.call(this, ...arr);
-  console.log("msg is " + messageGet.value);
+//   console.log("msg is " + messageGet.value);
   messageGet.value = "";
   messageType.value = "";
   messageAddress.value = "";
-  console.log("message sent to " + serviceName);
+//   console.log("message sent to " + serviceName);
 }
 
 function tapModal(e) {
@@ -240,10 +242,8 @@ function tapModal(e) {
 function tap() {
   const sel = document.getElementById("taptype");
   const tapType = sel.options[sel.selectedIndex].value;
-  console.log(tapType);
 
   var tapper = document.getElementById("tapServiceName").value;
-  console.log("tapper " + tapper);
   // assign default val in text as tapper but take input
   o2ws_method_new("/" + tapper, null, false, handle_message, null);
 
@@ -256,19 +256,17 @@ function tap() {
     localService: true,
   });
 
-  console.log(tappeeService);
 
   var tappingString = "" + tappeeService + ":" + tapper + ":" + tapType; // "K" for TAP_KEEP, "R" for TAP_RELIABLE, or "B" for TAP_BEST_EFFORT
   o2ws_tap(tappingString);
   generateOutput();
-  console.log(tappingString);
+  // console.log(tappingString);
 }
 
 // Shows messages sent to a specific service.
 function showMessages(e) {
   serviceNameMsgs = e.innerText.toString();
   selectedService = serviceNameMsgs.trim();
-  console.log("show msgs called " + selectedService);
   for (let i = 0; i < data.services.length; i++) {
     if (data.services[i].name === selectedService) {
       data.services[i].selected = true;
@@ -276,12 +274,11 @@ function showMessages(e) {
       data.services[i].selected = false;
     }
   }
-  console.log(data);
+  // console.log(data);
   genModalOutput();
 }
 
 function generateOutput() {
-  console.log("generateOut called");
   var template = Handlebars.compile(
     document.getElementById("hbsBody").innerHTML
   );
@@ -292,7 +289,6 @@ function generateOutput() {
 document.onload = generateOutput();
 
 function genModalOutput() {
-  console.log("generateOutModal called");
   var template = Handlebars.compile(
     document.getElementById("hbsModal").innerHTML
   );

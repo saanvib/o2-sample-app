@@ -13,125 +13,137 @@ https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js
 
 
 <div class="container">
-<br>
-<div class="row">
-   <div class="col-sm-6">
-   <h1>O2 Web Monitor</h1>
-</div>
-</div>
-<br>
-<div class="row" id="ensembleGetter"> 
-   <div class="col-sm-4">
-      <label>Enter host name to connect to.</label>
-      <input type="text" id="hostname" class="form-control">
+   <div class="row">
+      <div class="col col-8">
+      <br>
+      <div class="row">
+         <div class="col-sm-6">
+         <h1>O2 Web Monitor</h1>
+      </div>
+      </div>
+      <br>
+      <div class="row" id="ensembleGetter"> 
+         <div class="col-sm-4">
+            <label>Enter host name to connect to.</label>
+            <input type="text" id="hostname" class="form-control">
 
-   </div>
+         </div>
 
-   <div class="col-sm-4">
-      <label>Enter ensemble name to connect with.</label>
-      <input type="text" id="ensembleName" class="form-control">
+         <div class="col-sm-4">
+            <label>Enter ensemble name to connect.</label>
+            <input type="text" id="ensembleName" class="form-control">
 
-   </div>
-   <div class="col-sm-4 align-self-end">
-      <button type="button" class="btn btn-secondary" id="connecthost" onclick="o2wsInit()">
-         Connect to o2host.
-       </button>
-   </div>
+         </div>
+         <div class="col-sm-4 align-self-end">
+            <button type="button" class="btn btn-secondary" id="connecthost" onclick="o2wsInit()">
+               Connect to o2host.
+            </button>
+         </div>
 
-   </div>
-<div class="row">  
-   <br>
-<div class="col-sm-6" id="connected" hidden>
-   
-   <p>Succesfully connected to o2host. <i class="fa-regular fa-square-check"></i> </p>
-</div>
-</div>
-
-<br>
-<div id="mainBody" hidden>
-   <hr/>
-<div class="row"><p>To discover all services connected to this O2 host, click here.</p></div>
-<div class="row">
-<div class="col-sm-3">
-<button class="btn btn-secondary" id="viewservices" onclick="viewServices()">Discover Services</button>
-</div>
-<div class="col-sm-3">
-<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#createServiceModal">
-   Create service
- </button>
-</div>
-</div>
-<br>
-<div id="output">
-</div>
-<br>
-<br>
-</div>
-<script id="hbsModal" type="text/x-handlebars-template">
-   <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Message</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-         {{#each services}}
-         {{#if this.selected}}
-         {{#each this.messages}}
-         <tr>
-          <td>{{this.message}}</td>
-         </tr>
-          {{/each}}
-          {{/if}}
-        </tr>
-        {{/each}}
-      </tbody>
-    </table> 
-</script>
-
-
-<script id="hbsBody" type="text/x-handlebars-template">
-   <div id="serviceslist">
-
-      <table class="table">
-         <thead>
-           <tr>
-             <th scope="col">Service Name</th>
-             <!-- <th scope="col">Service Typespec</th> -->
-             <th scope="col">Status</th>
-           </tr>
-         </thead>
-         <tbody>
-            {{#each services}}
-           <tr>
-
-            {{#if this.localService}} 
-            <td><button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#messageModal" onclick="showMessages(this);">{{this.name}}</button></td>
-            {{else}} <td>{{this.name}} </td>{{/if}}
-
-            <!-- <td>{{this.typespecString}}</td> -->
-             <td id="serviceStatus">{{this.statusName}}</td>
-             <td>
-               <div class="input-group mb-3" style="max-width: 700px;">
-                  <input type="text" id="addressPostfix-{{this.name}}" class="form-control" placeholder="Message address">
-                  <input type="text" id="messageType-{{this.name}}" class="form-control" placeholder="Message typespec">
-                  <input type="text" id="messageGet-{{this.name}}" class="form-control" placeholder="Message to send">
-                  <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" id={{this.name}} type="button" onclick="sendMsg(this);">Send Message</button>
-                  </div>
-                </div>
-            </td>
-            <td><button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#tapModal" id={{this.name}} onclick="tapModal(this);">Tap</button></td>
-           </tr>
-           {{/each}}
-         </tbody>
-       </table>
+         </div>
+      <div class="row">  
+         <br>
+      <div class="col-sm-6" id="connected" hidden>
          
+         <p>Succesfully connected to o2host. <i class="fa-regular fa-square-check"></i> </p>
+      </div>
+      </div>
+
+      <br>
+      <div id="mainBody" hidden>
+         <hr/>
+      <div class="row"><p>To discover all services connected to this O2 host, click here.</p></div>
+      <div class="row">
+         <div class="col-sm-3">
+         <button class="btn btn-secondary" id="viewservices" onclick="viewServices()">Discover Services</button>
+         </div>
+         <div class="col-sm-3">
+         <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#createServiceModal">
+            Create service
+         </button>
+         </div>
+      </div>
+      <br>
+      <div id="output">
+      </div>
+      <br>
+      <br>
+      </div>
+      <script id="hbsModal" type="text/x-handlebars-template">
+         <table class="table">
+            <thead>
+            <tr>
+               {{#each services}}
+               {{#if this.selected}}
+               <th scope="col">Received Messages for Service {{this.name}}</th>
+               {{/if}}
+            {{/each}}
+               
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+               {{#each services}}
+               {{#if this.selected}}
+               {{#each this.messages}}
+               <tr>
+               <td>{{this.message}}</td>
+               </tr>
+               {{/each}}
+               {{/if}}
+            </tr>
+            {{/each}}
+            </tbody>
+         </table> 
+      </script>
+
+
+      <script id="hbsBody" type="text/x-handlebars-template">
+         <div id="serviceslist">
+
+            <table class="table">
+               <thead>
+               <tr>
+                  <th scope="col">Service Name</th>
+                  <th scope="col">Status</th>
+               </tr>
+               </thead>
+               <tbody>
+                  {{#each services}}
+               <tr>
+
+                  {{#if this.localService}} 
+                  <td><button type="button" class="btn btn-link" onclick="showMessages(this);">{{this.name}}</button></td>
+                  {{else}} <td>{{this.name}} </td>{{/if}}
+                  <td id="serviceStatus">{{this.statusName}}</td>
+                  <td>
+                     <div class="input-group mb-3" style="max-width: 700px;">
+                        <input type="text" id="addressPostfix-{{this.name}}" class="form-control" placeholder="Message address">
+                        <input type="text" id="messageType-{{this.name}}" class="form-control" placeholder="Message typespec">
+                        <input type="text" id="messageGet-{{this.name}}" class="form-control" placeholder="Message to send">
+                        <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" id={{this.name}} type="button" onclick="sendMsg(this);">Send Message</button>
+                        </div>
+                     </div>
+                  </td>
+                  <td><button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#tapModal" id={{this.name}} onclick="tapModal(this);">Tap</button></td>
+               </tr>
+               {{/each}}
+               </tbody>
+            </table>
+               
+         </div>
+
+
+      </script>
+      </div>
+      <div class="col col-4" style="margin-top:300px;">
+         
+         <div id="modalOutput">
+         </div>
+
+      </div>
    </div>
-
-
-</script>
 </div>
 
 
@@ -159,25 +171,7 @@ https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js
  </div>
 
    
-<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel" aria-hidden="true">
-   <div class="modal-dialog modal-dialog-centered" role="document">
-     <div class="modal-content">
-       <div class="modal-header">
-         <h5 class="modal-title" id="messageModalLabel">All Messages</h5> 
-       </div>
-       <div class="modal-body">
-         <div id="modalOutput">
-         </div>
-       </div>
-       <div class="modal-footer">
-         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-       </div>
-     </div>
-   </div>
- </div>
 
-
- <!-- Modal -->
  <div class="modal fade" id="createServiceModal" tabindex="-1" role="dialog" aria-labelledby="createServiceModalLabel" aria-hidden="true">
    <div class="modal-dialog modal-dialog-centered" role="document">
      <div class="modal-content">
@@ -189,10 +183,6 @@ https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js
          <p>Enter name for new service.</p>
          <div class="col-sm-6">
          <input type="text" id="newName"></input>
-         </div>
-         <p>Enter typespec for new service. String of consecutive characters, with s=string, i=integer, d=double, f=float. Ex: "siss" = string, integer, string, string.</p>
-         <div class="col-sm-6">
-         <input type="text" id="typespecInput"></input>
          </div>
        </div>
        <div class="modal-footer">
